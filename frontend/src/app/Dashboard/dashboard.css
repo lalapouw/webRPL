@@ -1,0 +1,146 @@
+/* Judul dan tombol */
+.judul {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 70px 20px 70px;
+}
+
+.judul h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.judul button {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.judul button:hover {
+  background-color: #005bbb;
+}
+
+/* Tabel Produk */
+.product-table {
+  margin: 0 60px 0 60px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Tabel Produk */
+table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0;
+  font-size: 16px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+table th,
+table td {
+  border: 1px solid #ccc;
+  padding: 12px;
+  text-align: center;
+}
+
+table th:first-child {
+  border-top-left-radius: 20px;
+}
+
+table th:last-child {
+  border-top-right-radius: 20px;
+}
+
+table tr:last-child td:first-child {
+  border-bottom-left-radius: 20px;
+}
+
+table tr:last-child td:last-child {
+  border-bottom-right-radius: 20px;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+/* Tombol Aksi */
+table button {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+table button:hover {
+  background-color: #ddd;
+}
+
+.product-table {
+  border-radius: 20px;
+}
+
+/* Form Tambah/Edit Produk */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+}
+
+.modal-content form input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-buttons button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+}
+
+.modal-buttons button[type="button"] {
+  background-color: #ccc;
+}

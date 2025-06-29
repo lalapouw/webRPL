@@ -1,64 +1,69 @@
-// app/login/page.jsx (Next.js App Router)
 "use client";
+
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import "@/styles/style_log.css"; 
+import "./style_log.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function LoginPage() {
-  const [form, setForm] = useState({ username: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "" });
+  const router = useRouter(); // ✅ digunakan untuk redirect
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Kirim ke API login
-    const handleSubmit = async (e) => {
-      e.preventDefault();
 
-      try {
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-        const data = await res.json();
+      // Cek content-type apakah JSON
+      const contentType = res.headers.get("content-type");
+      let data = {};
 
-        if (!res.ok) {
-          throw new Error(data.message || "Login gagal");
-        }
-
-        // ✅ Simpan session / redirect
-        console.log("Login berhasil:", data);
-        // redirect ke dashboard
-        // router.push("/dashboard");
-
-      } catch (err) {
-        alert(err.message);
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
       }
-    };
 
+      if (!res.ok) {
+        throw new Error(data.message || "Login gagal");
+      }
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // ✅ Login sukses → redirect ke homepage
+      console.log("Login sukses:", data);
+      router.push("/");
+
+    } catch (err) {
+      alert(err.message);
+    }
   };
+
 
   return (
     <div className="container">
       <div className="logo">
-        <Image src="/img/perfume.png" alt="Logo Parfum" width={100} height={100} />
+        <Image src="/perfume.png" alt="Logo Parfum" width={100} height={100} />
       </div>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div className="input-group">
           <i className="fas fa-user"></i>
           <input
-            type="text"
-            name="username"
-            placeholder="Username/Email"
+            type="email"
+            name="email"
+            placeholder="Email"
             required
-            value={form.username}
+            value={form.email}
             onChange={handleChange}
           />
         </div>

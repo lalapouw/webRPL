@@ -17,7 +17,6 @@ body {
 }
 
 .logo img {
-  width: 80px;
   margin-bottom: 15px;
 }
 
@@ -62,6 +61,10 @@ form {
 .login-link a {
   color: #f6b8b8;
   text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
 }
 
 button {
