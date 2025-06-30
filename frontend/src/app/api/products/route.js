@@ -1,58 +1,102 @@
 import { NextResponse } from "next/server";
-import { IncomingForm } from "formidable";
 import fs from "fs";
 import path from "path";
 import { createConnection } from "@/lib/db";
+import { v4 as uuidv4 } from "uuid";
 
 export const config = {
   api: {
-    bodyParser: false, // ⛔️ penting: jangan parse body
+    bodyParser: false,
   },
 };
 
-function streamToBuffer(stream) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    stream.on("data", chunk => chunks.push(chunk));
-    stream.on("end", () => resolve(Buffer.concat(chunks)));
-    stream.on("error", err => reject(err));
-  });
-}
-
 export async function POST(req) {
   const formData = await req.formData();
-  const file = formData.get("image");
   const name = formData.get("name");
   const stock = formData.get("stock");
   const price = formData.get("price");
+  const description = formData.get("description") || ""; // Get description or default to empty string
 
-  if (!file || typeof file === "string") {
-    return NextResponse.json({ message: "File tidak valid" }, { status: 400 });
+  // Process up to 3 images
+  const imagePaths = [];
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  
+  // Ensure upload directory exists
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  const filename = `${Date.now()}-${file.name}`;
-  const filepath = path.join(uploadDir, filename);
+  try {
+    // Process each image (up to 3)
+    for (let i = 0; i < 3; i++) {
+      const file = formData.get(`image${i}`);
+      if (file && typeof file !== "string") {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const fileExt = path.extname(file.name);
+        const filename = `${uuidv4()}${fileExt}`;
+        const filepath = path.join(uploadDir, filename);
+        
+        await fs.promises.writeFile(filepath, buffer);
+        imagePaths.push(`/uploads/${filename}`);
+      }
+    }
 
-  // pastikan folder ada
-  fs.mkdirSync(uploadDir, { recursive: true });
-  fs.writeFileSync(filepath, buffer);
+    // Convert image array to JSON string for database storage
+    const imagesJson = JSON.stringify(imagePaths);
 
-  const imagePath = `/uploads/${filename}`;
+    // Save to DB
+    const db = await createConnection();
+    await db.execute(
+      "INSERT INTO products (name, stock, price, description, images) VALUES (?, ?, ?, ?, ?)",
+      [name, stock, price, description, imagesJson]
+    );
 
-  // Simpan ke DB
-  const db = await createConnection();
-  await db.execute(
-    "INSERT INTO products (name, stock, price, image) VALUES (?, ?, ?, ?)",
-    [name, stock, price, imagePath]
-  );
-
-  return NextResponse.json({ message: "Produk berhasil ditambahkan" });
+    return NextResponse.json({ 
+      success: true,
+      message: "Produk berhasil ditambahkan" 
+    });
+  } catch (error) {
+    console.error("Gagal menambahkan produk:", error);
+    // Cleanup uploaded files if error occurs
+    imagePaths.forEach(imagePath => {
+      const filepath = path.join(process.cwd(), "public", imagePath);
+      if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+    });
+    return NextResponse.json(
+      { 
+        success: false,
+        message: "Gagal menambahkan produk",
+        error: error.message 
+      }, 
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET() {
   const db = await createConnection();
-  const [rows] = await db.execute("SELECT * FROM products");
-  return NextResponse.json(rows);
+  try {
+    const [rows] = await db.execute("SELECT * FROM products");
+    
+    // Ensure images is always an array and description exists
+    const products = rows.map(product => ({
+      ...product,
+      images: product.images ? JSON.parse(product.images) : [],
+      description: product.description || ""
+    }));
+    
+    return NextResponse.json(products);
+  } catch (error) {
+    console.error("Gagal mengambil produk:", error);
+    return NextResponse.json(
+      { 
+        success: false,
+        message: "Gagal mengambil produk",
+        error: error.message 
+      }, 
+      { status: 500 }
+    );
+  }
 }

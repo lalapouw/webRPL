@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { createConnection } from "@/lib/db";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers"; // ✅
 
-// POST /api/auth/login
+const JWT_SECRET = process.env.JWT_SECRET || "SECRET";
+
 export async function POST(req) {
   const { email, password } = await req.json();
 
@@ -20,7 +23,25 @@ export async function POST(req) {
     return NextResponse.json({ message: "Password salah" }, { status: 401 });
   }
 
-  // TODO: Set session/cookie/token (jika pakai autentikasi lanjutan)
+  // 🔐 Buat JWT token
+  const token = jwt.sign(
+    {
+      userId: user.id, // 👈 harus "userId" biar konsisten dengan route profile
+      email: user.email,
+      username: user.username,
+    },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  // ✅ Simpan token ke cookie
+const cookieStore = cookies();
+  cookieStore.set("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+  });
 
   return NextResponse.json({
     message: "Login berhasil",
@@ -28,7 +49,7 @@ export async function POST(req) {
       id: user.id,
       username: user.username,
       email: user.email,
-      role: user.role
-    }
+      role: user.role,
+    },
   });
 }

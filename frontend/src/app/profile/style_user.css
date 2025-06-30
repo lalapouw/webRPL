@@ -1,0 +1,114 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #fff;
+}
+
+main {
+  padding: 30px;
+}
+
+.profile-container {
+  background: #f1f1f1;
+  padding: 30px;
+  border-radius: 8px;
+}
+
+.profile-content {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.form-section {
+  flex: 1;
+  min-width: 300px;
+  margin-right: 40px;
+}
+
+.form-section input {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.save-button {
+  background-color: #423c6a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.profile-picture {
+  position: relative;
+  text-align: center;
+  min-width: 200px;
+}
+
+img .foto-profile {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  background-color: #f0f0f0;
+}
+
+.edit-button {
+  position: absolute;
+  right: 0;
+  top: -50px;
+  background-color: #aaa1c4;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 2;
+}
+
+.avatar {
+  width: 180px;
+  height: 180px;
+  border: 2px solid black;
+  border-radius: 50%;
+  position: relative;
+  margin: 0 auto 10px;
+}
+
+.avatar::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border: 2px solid black;
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+.avatar::after {
+  content: '';
+  position: absolute;
+  top: 95px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 60px;
+  border: 2px solid black;
+  border-bottom: none;
+  border-radius: 100px 100px 0 0;
+  background-color: transparent;
+}
+
+.username {
+  font-size: 20px;
+  font-weight: bold;
+}

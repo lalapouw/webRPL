@@ -1,26 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import "./dashboard.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Navbar from "@/components/Navbar/Navbar";
 
-
 export default function AdminProductPage() {
   const [products, setProducts] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
+  const [deletedImages, setDeletedImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [formProduk, setFormProduk] = useState({
     name: "",
     stock: "",
     price: "",
-    image: ""
+    description: "",
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -30,15 +29,37 @@ export default function AdminProductPage() {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/products");
+      if (!res.ok) throw new Error('Failed to fetch products');
+      
       const data = await res.json();
-      setProducts(data);
+      
+      const normalizedProducts = data.map(product => ({
+        ...product,
+        images: Array.isArray(product.images) ? product.images : 
+               product.image ? [product.image] : [],
+        description: product.description || "" // Ensure description exists
+      }));
+      
+      setProducts(normalizedProducts);
     } catch (err) {
+      setError(err.message);
       console.error("Gagal mengambil data produk:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleTextareaChange = (e) => {
+    const { name, value } = e.target;
+    setFormProduk(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,12 +68,24 @@ export default function AdminProductPage() {
 
   const handleSubmitProduk = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     const formData = new FormData();
     formData.append("name", formProduk.name);
     formData.append("stock", formProduk.stock);
     formData.append("price", formProduk.price);
-    formData.append("image", selectedFile); // dari <input type="file" />
+    formData.append("description", formProduk.description); // Added description
+
+
+    if (editMode) {
+      formData.append("existingImages", JSON.stringify(existingImages));
+      formData.append("deletedImages", JSON.stringify(deletedImages));
+    }
+
+    selectedFiles.forEach((file, index) => {
+      formData.append(`image${index}`, file);
+    });
 
     try {
       const res = await fetch(
@@ -67,40 +100,108 @@ export default function AdminProductPage() {
       if (!res.ok) throw new Error(result.message || "Gagal menyimpan produk");
 
       alert(editMode ? "Produk berhasil diubah" : "Produk berhasil ditambahkan");
-      setShowModal(false);
-      setEditMode(false);
-      setEditingId(null);
-      setFormProduk({ name: "", stock: "", price: "", image: "" });
-      setSelectedFile(null);
+      resetForm();
       fetchData();
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
+      alert(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const resetForm = () => {
+    setShowModal(false);
+    setEditMode(false);
+    setEditingId(null);
+    setFormProduk({ 
+      name: "", 
+      stock: "", 
+      price: "", 
+      description: "" 
+    });    
+    setSelectedFiles([]);
+    setExistingImages([]);
+    setDeletedImages([]);
+    setError(null);
+  };
+
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
+    const files = Array.from(e.target.files);
+    if (files.length > 3) {
+      alert("Unggah maksimal 3 gambar");
+      return;
     }
+    setSelectedFiles(files);
   };
 
   const handleDelete = async (id) => {
     if (!confirm("Yakin ingin menghapus produk ini?")) return;
+    setLoading(true);
 
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: "DELETE"
       });
 
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
+      if (!res.ok) throw new Error(await res.text());
 
-      // Hapus dari state
       setProducts(products.filter((p) => p.id !== id));
     } catch (err) {
+      setError(err.message);
       alert(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const removeExistingImage = (indexToRemove) => {
+    const imageToDelete = existingImages[indexToRemove];
+    setDeletedImages([...deletedImages, imageToDelete]);
+    setExistingImages(existingImages.filter((_, index) => index !== indexToRemove));
+  };
+
+  const removeSelectedFile = (indexToRemove) => {
+    setSelectedFiles(selectedFiles.filter((_, index) => index !== indexToRemove));
+  };
+
+  const ProductImage = ({ src, alt, ...props }) => {
+    const [imgError, setImgError] = useState(false);
+    
+    if (imgError || !src) {
+      return (
+        <div 
+          className="image-placeholder" 
+          style={{
+            width: "60px",
+            height: "60px",
+            backgroundColor: "#f0f0f0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "8px"
+          }}
+          {...props}
+        >
+          <span style={{ fontSize: "10px" }}>No Image</span>
+        </div>
+      );
+    }
+    
+    return (
+      <img 
+        src={src} 
+        alt={alt} 
+        onError={() => setImgError(true)}
+        style={{ 
+          width: "60px", 
+          height: "60px", 
+          objectFit: "cover", 
+          borderRadius: "8px" 
+        }}
+        {...props}
+      />
+    );
   };
 
   return (
@@ -108,59 +209,101 @@ export default function AdminProductPage() {
       <Navbar />
       <div className="judul">
         <h1>Kelola Produk</h1>
-        <button onClick={() => setShowModal(true)}>+ Tambah Produk</button>
+        <button 
+          onClick={() => setShowModal(true)}
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "+ Tambah Produk"}
+        </button>
       </div>
+
+      {error && (
+        <div className="error-message" style={{ color: "red", margin: "10px 0" }}>
+          {error}
+        </div>
+      )}
 
       <div className="product-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama Produk</th>
-              <th>Stock</th>
-              <th>Harga</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p.id}>
-                <td><img
-                    src={p.image}
-                    alt={p.name}
-                    style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
-                  />{p.name}</td>
-                <td>{p.stock}</td>
-                <td>Rp {p.price.toLocaleString()}</td>
-                <td>
-                  <button
-                    onClick={() => {
-                      setFormProduk({
-                        name: p.name,
-                        stock: p.stock,
-                        price: p.price,
-                        image: p.image,
-                      });
-                      setEditingId(p.id);
-                      setEditMode(true);
-                      setShowModal(true);
-                    }}
-                  >
-                    Edit
-                  </button>
-
-                  <button onClick={() => handleDelete(p.id)}>Hapus</button>
-                </td>
+        {loading && !products.length ? (
+          <div>Loading products...</div>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Gambar</th>
+                <th>Nama Produk</th>
+                <th>Deskripsi</th>
+                <th>Stock</th>
+                <th>Harga</th>
+                <th>Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map((p) => {
+                const productImages = Array.isArray(p.images) ? p.images : [];
+                return (
+                  <tr key={p.id}>
+                    <td>
+                      <div style={{ display: 'flex', gap: '5px' }}>
+                        {productImages.length > 0 ? (
+                          productImages.map((img, idx) => (
+                            <ProductImage
+                              key={idx}
+                              src={img}
+                              alt={`${p.name} ${idx}`}
+                            />
+                          ))
+                        ) : (
+                          <ProductImage alt="No image" />
+                        )}
+                      </div>
+                    </td>
+                    <td>{p.name}</td>
+                    <td className="description-cell">
+                      {p.description.length > 50 
+                        ? `${p.description.substring(0, 50)}...` 
+                        : p.description}
+                    </td>
+                    <td>{p.stock}</td>
+                    <td>Rp {p.price.toLocaleString()}</td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          setFormProduk({
+                            name: p.name,
+                            stock: p.stock,
+                            price: p.price,
+                            description: p.description,
+                          });
+                          setExistingImages(productImages);
+                          setEditingId(p.id);
+                          setEditMode(true);
+                          setShowModal(true);
+                        }}
+                        disabled={loading}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(p.id)}
+                        disabled={loading}
+                      >
+                        Hapus
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>Tambah Produk</h2>
+            <h2>{editMode ? "Edit Produk" : "Tambah Produk"}</h2>
+            {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
             <form onSubmit={handleSubmitProduk}>
               <input
                 type="text"
@@ -168,6 +311,8 @@ export default function AdminProductPage() {
                 placeholder="Nama Produk"
                 onChange={handleInputChange}
                 value={formProduk.name}
+                required
+                disabled={loading}
               />
               <input
                 type="number"
@@ -175,6 +320,9 @@ export default function AdminProductPage() {
                 placeholder="Stok"
                 onChange={handleInputChange}
                 value={formProduk.stock}
+                required
+                min="0"
+                disabled={loading}
               />
               <input
                 type="number"
@@ -182,32 +330,110 @@ export default function AdminProductPage() {
                 placeholder="Harga"
                 onChange={handleInputChange}
                 value={formProduk.price}
+                required
+                min="0"
+                disabled={loading}
               />
+
+              <textarea
+                name="description"
+                placeholder="Deskripsi Produk"
+                onChange={handleTextareaChange}
+                value={formProduk.description}
+                rows="4"
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  border: '1px solid #ddd',
+                  resize: 'vertical'
+                }}
+              />
+
+              <div className="image-preview" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {existingImages.map((img, idx) => (
+                  <div key={`existing-${idx}`} style={{ position: 'relative' }}>
+                    <ProductImage
+                      src={img}
+                      alt={`Existing ${idx}`}
+                      style={{ width: "60px", height: "60px" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeExistingImage(idx)}
+                      style={{
+                        position: 'absolute',
+                        top: '-5px',
+                        right: '-5px',
+                        background: 'red',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer'
+                      }}
+                      disabled={loading}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+
+                {selectedFiles.map((file, idx) => (
+                  <div key={`new-${idx}`} style={{ position: 'relative' }}>
+                    <ProductImage
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${idx}`}
+                      style={{ width: "60px", height: "60px" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeSelectedFile(idx)}
+                      style={{
+                        position: 'absolute',
+                        top: '-5px',
+                        right: '-5px',
+                        background: 'red',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        cursor: 'pointer'
+                      }}
+                      disabled={loading}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
 
               <input
                 type="file"
-                name="image"
+                name="images"
                 accept="image/*"
-                onChange={handleFileChange} // ← pakai ini
+                multiple
+                onChange={handleFileChange}
+                disabled={loading}
               />
+              <small>Maksimal 3 gambar (total termasuk yang sudah ada)</small>
 
               <div className="modal-buttons">
-                <button type="submit">Simpan</button>
+                <button type="submit" disabled={loading}>
+                  {loading ? "Menyimpan..." : "Simpan"}
+                </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    setFormProduk({ name: "", stock: "", price: "", image: "" });
-                    setSelectedFile(null);
-                    setEditMode(false);
-                    setEditingId(null);
-                  }}
+                  onClick={resetForm}
+                  disabled={loading}
                 >
                   Batal
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Keranjang - Parfumy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="Homepage.css">
+    <link rel="stylesheet" href="Cart.css">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Parfumy</h1>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" placeholder="Cari parfum favorit Anda..." class="search-input">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="header-actions">
+                    <button class="cart-btn"><i class="fas fa-shopping-cart"></i><span class="cart-count">3</span></button>
+                    <button class="user-btn"><i class="fas fa-user"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Section -->
+    <section class="cart-section container">
+        <h2 class="cart-title">Keranjang</h2>
+
+        <div class="cart-container">
+            <!-- Cart Items -->
+            <div class="cart-items">
+
+                <!-- Item 1 -->
+                <div class="cart-item">
+                    <img src="img/product1.jpg" alt="Produk 1" class="cart-image">
+                    <div class="cart-details">
+                        <p class="cart-product-name">SAFF & Co. Solaris</p>
+                        <small>Extrait de Parfum</small>
+                    </div>
+                    <div class="cart-price">Rp70.000</div>
+                    <div class="cart-quantity">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-count">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                    <div class="cart-total">Rp70.000</div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="cart-item">
+                    <img src="img/product2.jpg" alt="Produk 2" class="cart-image">
+                    <div class="cart-details">
+                        <p class="cart-product-name">SAFF & Co. Ostara</p>
+                        <small>Extrait de Parfum</small>
+                    </div>
+                    <div class="cart-price">Rp60.000</div>
+                    <div class="cart-quantity">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-count">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                    <div class="cart-total">Rp60.000</div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="cart-item">
+                    <img src="img/product3.jpg" alt="Produk 3" class="cart-image">
+                    <div class="cart-details">
+                        <p class="cart-product-name">SAFF & Co. Chno</p>
+                        <small>Extrait de Parfum</small>
+                    </div>
+                    <div class="cart-price">Rp70.000</div>
+                    <div class="cart-quantity">
+                        <button class="qty-btn">-</button>
+                        <span class="qty-count">1</span>
+                        <button class="qty-btn">+</button>
+                    </div>
+                    <div class="cart-total">Rp70.000</div>
+                </div>
+
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <h3>Ringkasan Belanja</h3>
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>Rp200.000</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Ongkos Kirim</span>
+                        <span>Gratis</span>
+                    </div>
+                    <hr>
+                    <div class="summary-total">
+                        <strong>Total</strong>
+                        <strong>Rp200.000</strong>
+                    </div>
+                    <button class="checkout-btn">Checkout</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
