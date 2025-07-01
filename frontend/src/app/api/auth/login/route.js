@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createConnection } from "@/lib/db";
+import { pool } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers"; // ✅
@@ -10,7 +10,7 @@ export async function POST(req) {
   const { email, password } = await req.json();
 
   const db = await createConnection();
-  const [rows] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
+  const [rows] = await pool.execute("SELECT * FROM users WHERE email = ?", [email]);
 
   if (rows.length === 0) {
     return NextResponse.json({ message: "Email tidak ditemukan" }, { status: 404 });
@@ -35,7 +35,7 @@ export async function POST(req) {
   );
 
   // ✅ Simpan token ke cookie
-const cookieStore = cookies();
+const cookieStore = await cookies();
   cookieStore.set("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

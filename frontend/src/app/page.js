@@ -32,6 +32,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import Hero from "@/components/Hero/Hero";
 import Product from "@/components/Product/Product";
 import Footer from "@/components/Footer/Footer";
+import Brand from "@/components/Brand/Brand";
 
 export default function Home() {
   const router = useRouter();
@@ -54,6 +55,7 @@ export default function Home() {
     <>
     <Navbar />
     <Hero />
+    <Brand />
     <Product />
     <div>
 

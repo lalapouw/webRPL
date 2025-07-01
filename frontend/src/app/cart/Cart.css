@@ -1,97 +1,23 @@
 /* Font default */
-body {
+.body-cart {
     font-family: Arial, sans-serif;
+    background: #7e91e4;
 }
 
-/* Header Cart */
-.header {
-    background-color: #463c72; /* Ungu gelap */
-    color: white;
-    padding: 1rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.header .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem; /* Jarak kiri-kanan */
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-}
-
-.logo h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: white;
-    white-space: nowrap;
-}
-
-/* Search Bar */
-.search-bar {
-    flex: 1;
-    max-width: 500px;
-    display: flex;
-    align-items: center;
-    background: #d9d9d9;
-    border-radius: 15px;
-    padding: 0.4rem 1rem;
-}
-
-.search-input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 0.5rem;
-    font-size: 1rem;
-    outline: none;
-}
-
-.search-btn {
-    background: transparent;
-    border: none;
-    color: #e89984;
-    font-size: 1.1rem;
-    cursor: pointer;
-}
-
-/* Ikon Keranjang dan User */
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.cart-btn,
-.user-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.3rem;
-    cursor: pointer;
-    padding: 5px;
-}
-
-.cart-btn {
-    color: white;
-}
-
-.user-btn {
-    color: #ffd93d;
-}
 
 /* Cart Section */
 .cart-section {
     padding: 2rem 0;
+    margin-left: 2.5rem;
+    margin-right: 2.5rem;
+    
 }
 
 .cart-title {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 2rem;
+    color: #f7f7f7;
 }
 
 /* Cart Container */
@@ -120,6 +46,12 @@ body {
     gap: 1rem;
 }
 
+.cart-item .input-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 .cart-image {
     width: 80px;
     height: 80px;
@@ -135,7 +67,7 @@ body {
 }
 
 .cart-product-name {
-    font-size: 1rem;
+    font-size: 13px;
     font-weight: 600;
     margin: 0;
     color: #333;
@@ -145,7 +77,7 @@ body {
 .cart-total {
     font-weight: bold;
     color: #667eea;
-    font-size: 1rem;
+    font-size: 15px;
     text-align: center;
 }
 
@@ -154,7 +86,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 1.5rem;
 }
 
 .qty-btn {
@@ -171,14 +103,39 @@ body {
     font-weight: 600;
 }
 
-/* Optional Remove Button */
-.remove-btn {
-    background: transparent;
+.delete-btn {
+    display: inline-block;
+    background-color: #dc3545;
+    color: white;
     border: none;
-    font-size: 1.2rem;
-    color: #ff4757;
+    padding: 6px 12px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    width: 40px;
 }
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.delete-btn.icon-only {
+  background: none;
+  border: none;
+  color: #dc3545;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn.icon-only:hover {
+  color: #a71d2a;
+}
+
 
 /* Cart Summary */
 .cart-summary {

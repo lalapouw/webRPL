@@ -1,11 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./navbar.css"; // Atau '@/styles/navbar.css'
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const router = useRouter();
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -17,6 +20,14 @@ export default function Navbar() {
       }
     }
   }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log("Search triggered:", searchKeyword);
+    if (searchKeyword.trim() !== "") {
+      router.push(`/search?keyword=${encodeURIComponent(searchKeyword)}`);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -32,19 +43,25 @@ export default function Navbar() {
             <Link href="/"><img src="/perfume.png" alt="" /></Link>
           </div>
 
-          <div className="search-bar">
+          <form className="search-bar"  onSubmit={handleSearch}>
             <input
               type="text"
               placeholder="Cari parfum favorit Anda..."
               className="search-input"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
             />
-            <button className="search-btn">
+            <button className="search-btn" type="submit">
               <i className="fas fa-search"></i>
             </button>
-          </div>
+          </form>
 
           <div className="header-actions">
-            <button className="cart-btn">
+            <button
+              className="cart-btn"
+              onClick={() => router.push('/cart')}
+              aria-label="Lihat Keranjang"
+            >
               <i className="fas fa-shopping-cart"></i>
             </button>
 

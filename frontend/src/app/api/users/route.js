@@ -1,22 +1,45 @@
 import { NextResponse } from "next/server";
-import { createConnection } from "@/lib/db"; // atau connectDB, sesuai yang kamu pakai
+import { pool } from "@/lib/db"; // Sudah pakai pool untuk koneksi efisien
 
 // GET: Ambil semua user
 export async function GET() {
-  const db = await createConnection();
-  const [rows] = await db.execute("SELECT id, username, email, role FROM users");
-  return NextResponse.json(rows);
+  try {
+    const [rows] = await pool.execute(
+      "SELECT id, username, email, role FROM users"
+    );
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error("❌ Gagal ambil user:", error);
+    return NextResponse.json(
+      { message: "Gagal mengambil data user", error: error.message },
+      { status: 500 }
+    );
+  }
 }
 
 // POST: Tambah user baru
 export async function POST(req) {
-  const { name, email, password, role } = await req.json();
+  try {
+    const { username, email, password, role } = await req.json();
 
-  const db = await createConnection();
-  await db.execute(
-    "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
-    [name, email, password, role || 'user']
-  );
+    if (!username || !email || !password) {
+      return NextResponse.json(
+        { message: "Data tidak lengkap" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json({ message: "User berhasil ditambahkan" });
+    await pool.execute(
+      "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)",
+      [username, email, password, role || "user"]
+    );
+
+    return NextResponse.json({ message: "User berhasil ditambahkan" });
+  } catch (error) {
+    console.error("❌ Gagal tambah user:", error);
+    return NextResponse.json(
+      { message: "Gagal menambahkan user", error: error.message },
+      { status: 500 }
+    );
+  }
 }
