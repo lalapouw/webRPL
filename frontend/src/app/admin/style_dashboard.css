@@ -1,0 +1,162 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  background-color: #ffffff;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 270px;
+  background-color: #4c416d;
+  height: 100vh;
+  padding: 20px 0;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 30px;
+}
+
+.brand img {
+  width: 35px;
+}
+
+.brand span {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+}
+
+.menu li {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  font-size: 18px;
+  gap: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.menu li:hover {
+  background-color: #3d345d;
+}
+
+.menu li.active {
+  background-color: white;
+  color: #000;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+  font-weight: bold;
+}
+
+.menu li.active i {
+  color: #000;
+}
+
+/* Konten Utama */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background-color: #4c416d;
+  padding: 15px 25px;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+/* Header dibagi 3 */
+.header-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 20px;
+}
+
+.header-center {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.header-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Search Bar */
+.search-bar {
+  background-color: #d9d9d9;
+  padding: 6px 12px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  width: 250px;
+  max-width: 100%;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  margin-left: 8px;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+}
+
+.search-bar i {
+  color: #e47c7c;
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info i {
+  font-size: 36px;
+}
+
+.user-name {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.user-name .name {
+  font-weight: 500;
+}
+
+.user-name .role {
+  font-size: 12px;
+  color: #c9c5d9;
+}
+
+.content {
+  padding: 30px;
+}

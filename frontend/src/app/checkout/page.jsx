@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import './style_check.css';
 import Navbar from '@/components/Navbar/Navbar';
 import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function Checkout() {
   const [form, setForm] = useState({ name: '', address: '', phone: '' });
@@ -11,6 +12,8 @@ export default function Checkout() {
   const [showModal, setShowModal] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const router = useRouter();
+
 
   const searchParams = useSearchParams();
   const ids = searchParams.getAll('ids');
@@ -39,6 +42,35 @@ export default function Checkout() {
       setMessage('❌ ' + err.message);
     }
   };
+
+  const handleCheckout = async () => {
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: form.name,
+          address: form.address,
+          phone: form.phone,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Gagal checkout');
+
+      alert('✅ Checkout berhasil!');
+      router.push('/my-orders'); // atau halaman sukses lainnya
+
+    } catch (err) {
+      console.error('❌ Checkout error:', err);
+      alert(`Gagal: ${err.message}`);
+    }
+  };
+
+
 
   useEffect(() => {
     const ids = new URLSearchParams(window.location.search).getAll('ids'); // Ambil langsung dari URL
@@ -177,7 +209,7 @@ export default function Checkout() {
                 <p>Total</p>
                 <p><strong>Rp {(selectedProducts.reduce((acc, item) => acc + item.price * item.quantity, 0) + 9000 + 800).toLocaleString('id-ID')}</strong></p>
               </div>
-              <button className="btn-bayar">Checkout</button>
+              <button className="btn-bayar" onClick={handleCheckout}>Checkout</button>
             </div>
           </section>
         </main>

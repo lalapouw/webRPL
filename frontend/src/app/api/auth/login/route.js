@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "SECRET";
 export async function POST(req) {
   const { email, password } = await req.json();
 
-  const db = await createConnection();
+  const db = pool;
   const [rows] = await pool.execute("SELECT * FROM users WHERE email = ?", [email]);
 
   if (rows.length === 0) {

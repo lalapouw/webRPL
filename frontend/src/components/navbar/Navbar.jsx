@@ -79,7 +79,7 @@ export default function Navbar() {
                   ) : (
                     <>
                       <Link href="/profile">Profil Saya</Link>
-                      <Link href="/orders">Pesanan Saya</Link>
+                      <Link href="/my-orders">Pesanan Saya</Link>
                       <a href="#" onClick={handleLogout}>Logout</a>
                     </>
                   )
