@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
+import Link from 'next/link';
 import './brand.css';
 
 export default function Brand() {
@@ -46,6 +47,16 @@ export default function Brand() {
     };
   }, []);
 
+  const brands = [
+    { name: 'HMNS', logo: 'hmns.png', slug: 'hmns' },
+    { name: 'SAFF & Co.', logo: 'saff n co.png', slug: 'saff-co' },
+    { name: 'My Konos', logo: 'mykonos.png', slug: 'mykonos' },
+    { name: 'ONIX', logo: 'onix.png', slug: 'onix' },
+    { name: 'Lilith & Eve', logo: 'lilithneve.png', slug: 'lilith-eve' },
+    { name: 'Carl & Claire', logo: 'carlnclaire.png', slug: 'carl-claire' },
+    { name: 'Hint', logo: 'PG', slug: 'hint' },
+  ];
+
   return (
     <div className="brand-container">
       <header className="brand-header">
@@ -60,20 +71,17 @@ export default function Brand() {
         </button>
 
         <div className="stores-grid" id="storesGrid">
-          {[
-            { name: 'HMNS', logo: 'hmns.png', className: 'gramedia-utama' },
-            { name: 'SAFF & Co.', logo: 'saff n co.png', className: 'gramedia-widiasarana' },
-            { name: 'My Konos', logo: 'mykonos.png', className: 'bip' },
-            { name: 'ONIX', logo: 'onix.png', className: 'elex' },
-            { name: 'Lilith & Eve', logo: 'lilithneve.png', className: 'mcl' },
-            { name: 'Carl & Claire', logo: 'carlnclaire.png', className: 'kpg' },
-            { name: 'Hint', logo: 'PG', className: 'phoenix' }
-          ].map((store, index) => (
-            <div key={index} className={`store-card ${store.className}`}>
-              <div className="store-logo"><img src={`/logos/${store.logo}`} alt={store.name} /></div>
+          {brands.map((store, index) => (
+            <Link
+              key={index}
+              href={`/search?brand=${store.slug}`}
+              className={`store-card ${store.slug}`}
+            >
+              <div className="store-logo">
+                <img src={`/logos/${store.logo}`} alt={store.name} />
+              </div>
               <div className="store-name">{store.name}</div>
-              <div className="store-category"></div>
-            </div>
+            </Link>
           ))}
         </div>
 

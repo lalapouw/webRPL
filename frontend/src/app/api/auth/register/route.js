@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createConnection } from "@/lib/db"; // atau connectDB, sesuaikan
+import { pool } from "@/lib/db"; // atau connectDB, sesuaikan
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
@@ -10,7 +10,7 @@ export async function POST(req) {
       return NextResponse.json({ message: "Semua field wajib diisi" }, { status: 400 });
     }
 
-    const db = await createConnection();
+    const db = pool;
 
     // Cek apakah email sudah terdaftar
     const [existingUser] = await db.execute(

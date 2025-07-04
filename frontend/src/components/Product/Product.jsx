@@ -100,7 +100,7 @@ export default function Product() {
                   <p className="product-price">
                     Rp {Number(product.price).toLocaleString()}
                   </p>
-                  <button 
+                  {/* <button 
                     className="add-to-cart-btn"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -110,7 +110,7 @@ export default function Product() {
                   >
                     <i className="fas fa-shopping-cart"></i>
                     Tambah ke Keranjang
-                  </button>
+                  </button> */}
                 </div>
               </div>
             ))

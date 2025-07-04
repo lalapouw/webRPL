@@ -8,10 +8,9 @@ export default function Hero() {
     <section className="hero">
       <div className="hero-content">
         <div className="hero-text">
-          <h2>Buy Perfume in Large Quantities</h2>
+          <h2>Abadikan Setiap Momen dengan Parfum Terbaik.</h2>
           <p>
-            Dapatkan parfum berkualitas tinggi dengan harga terbaik untuk
-            pembelian dalam jumlah besar
+            Dapatkan parfum lokal dengan harga dan kualitas terbaik
           </p>
           <button className="cta-button">Jelajahi Koleksi</button>
         </div>

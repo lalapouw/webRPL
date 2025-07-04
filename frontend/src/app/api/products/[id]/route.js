@@ -31,6 +31,8 @@ export async function GET(request, { params }) {
     return NextResponse.json({
       id: product.id,
       name: product.name || "",
+      brand: product.brand || "",
+      brand_slug: product.brand_slug || "",
       price: product.price || 0,
       stock: product.stock || 0,
       description: product.description || "",
@@ -51,6 +53,8 @@ export async function PUT(request, { params }) {
   try {
     const formData = await request.formData();
     const name = formData.get("name");
+    const brand = formData.get("brand") || "";
+    const brand_slug = formData.get("brand_slug") || "";
     const stock = formData.get("stock");
     const price = formData.get("price");
     const description = formData.get("description") || "";
@@ -91,9 +95,10 @@ export async function PUT(request, { params }) {
       .concat(newImages);
 
     await pool.execute(
-      "UPDATE products SET name = ?, stock = ?, price = ?, description = ?, images = ? WHERE id = ?",
-      [name, stock, price, description, JSON.stringify(updatedImages), id]
+      "UPDATE products SET name = ?, stock = ?, price = ?, description = ?, brand = ?, brand_slug = ?, images = ? WHERE id = ?",
+      [name, stock, price, description, brand, brand_slug, JSON.stringify(updatedImages), id]
     );
+
 
     const [updatedRows] = await pool.execute("SELECT * FROM products WHERE id = ?", [id]);
 

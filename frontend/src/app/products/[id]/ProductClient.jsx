@@ -45,23 +45,43 @@ const selectImage = (index) => setCurrentImageIndex(index);
     if (quantity > 1) setQuantity(prev => prev - 1);
   };
 
-    const addToCart = async () => {
-    await fetch('/api/cart', {
-        method: 'POST',
-        body: JSON.stringify({ productId: product.id, quantity }),
-        headers: { 'Content-Type': 'application/json' },
-    });
-    alert("Berhasil ditambahkan ke keranjang!");
-    };
-
-  const buyNow = () => {
-    alert(`Membeli ${quantity} ${product.name} sekarang!`);
-    // Here you would typically navigate to checkout
+  const addToCart = async () => {
+  await fetch('/api/cart', {
+      method: 'POST',
+      body: JSON.stringify({ productId: product.id, quantity }),
+      headers: { 'Content-Type': 'application/json' },
+  });
+  alert("Berhasil ditambahkan ke keranjang!");
   };
 
-  const goBack = () => {
-    router.back();
+  const buyNow = async () => {
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "",       // kosong dulu
+          address: "",
+          phone: "",
+          directBuy: true,
+          productId: product.id,
+          quantity,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Gagal menyimpan order");
+
+      // Redirect ke halaman checkout setelah berhasil
+      router.push("/checkout");
+    } catch (err) {
+      console.error("❌ Gagal beli sekarang:", err.message);
+      alert("Gagal melakukan pembelian langsung: " + err.message);
+    }
   };
+
 
 if (loading) {
     return (
@@ -75,7 +95,7 @@ if (loading) {
     return (
       <div className="error-container">
         <p className="error-message">Gagal memuat produk: {error}</p>
-        <button onClick={goBack} className="back-button">
+        <button onClick={() => router.back()} className="back-button">
           Kembali
         </button>
       </div>
@@ -98,7 +118,7 @@ if (loading) {
     <div className="product-detail-container">
       
       <div className="product-header">
-        <button className="back-button" onClick={goBack} aria-label="Kembali">
+        <button className="back-button" onClick={() => router.back()} aria-label="Kembali">
           ←
         </button>
       </div>
@@ -169,7 +189,10 @@ if (loading) {
         <div className="product-info">
           <h1 className="product-title">{product.name}</h1>
           <div className="product-price">
-            Rp{product.price.toLocaleString('id-ID')}
+            Rp {Number(product.price).toLocaleString("id-ID", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
           </div>
 
           <div className="section-title">Deskripsi</div>
@@ -228,14 +251,14 @@ if (loading) {
               </svg>
               {product.stock > 0 ? "Masukkan Keranjang" : "Stok Habis"}
             </button>
-            <button 
+            {/* <button 
               className="buy-button" 
               onClick={buyNow}
               disabled={product.stock <= 0}
               aria-label="Beli sekarang"
             >
               Beli Sekarang
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

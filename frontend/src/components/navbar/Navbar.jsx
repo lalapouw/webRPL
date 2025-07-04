@@ -21,6 +21,7 @@ export default function Navbar() {
     }
   }, []);
 
+
   const handleSearch = (e) => {
     e.preventDefault();
     console.log("Search triggered:", searchKeyword);

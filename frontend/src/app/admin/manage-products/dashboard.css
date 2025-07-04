@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 70px 20px 70px;
+  margin: 0px 50px 20px 20px;
 }
 
 .judul h1 {
@@ -28,7 +28,7 @@
 
 /* Tabel Produk */
 .product-table {
-  margin: 0 60px 0 60px;
+  margin: 0 20px 0 20px;
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -76,12 +76,30 @@ table button {
   background-color: #eee;
   border: 1px solid #ccc;
   padding: 5px 10px;
-  margin-right: 5px;
+  margin: 6px 0 0 0;
   cursor: pointer;
 }
 
 table button:hover {
   background-color: #ddd;
+}
+
+table .edit-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+table .edit-button:hover {
+  background-color: #45a049;
+}
+
+table .delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+table .delete-button:hover {
+  background-color: #c22f2d;
 }
 
 .product-table {
@@ -116,6 +134,14 @@ table button:hover {
 }
 
 .modal-content form input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.modal-content form select {
   width: 100%;
   margin-bottom: 12px;
   padding: 10px;

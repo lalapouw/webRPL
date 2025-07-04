@@ -3,9 +3,27 @@
 import { useState, useEffect } from "react";
 import "./dashboard.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import Navbar from "@/components/Navbar/Navbar";
+
+  const brandOptions = [
+    { name: "HMNS", slug: "hmns" },
+    { name: "SAFF & Co.", slug: "saff-co" },
+    { name: "My Konos", slug: "my-konos" },
+    { name: "ONIX", slug: "onix" },
+    { name: "Lilith & Eve", slug: "lilith-eve" },
+    { name: "Carl & Claire", slug: "carl-claire" },
+    { name: "Hint", slug: "hint" }
+  ];
 
 export default function AdminProductPage() {
+  const [formProduk, setFormProduk] = useState({
+    name: "",
+    stock: "",
+    price: "",
+    description: "",
+    brand: "",
+    brand_slug: ""
+  });
+
   const [products, setProducts] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -15,12 +33,7 @@ export default function AdminProductPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [formProduk, setFormProduk] = useState({
-    name: "",
-    stock: "",
-    price: "",
-    description: "",
-  });
+
 
   const [showModal, setShowModal] = useState(false);
 
@@ -76,6 +89,9 @@ export default function AdminProductPage() {
     formData.append("stock", formProduk.stock);
     formData.append("price", formProduk.price);
     formData.append("description", formProduk.description); // Added description
+    formData.append("brand", formProduk.brand);
+    formData.append("brand_slug", formProduk.brand_slug);
+
 
 
     if (editMode) {
@@ -118,7 +134,9 @@ export default function AdminProductPage() {
       name: "", 
       stock: "", 
       price: "", 
-      description: "" 
+      description: "",
+      brand: "",
+      brand_slug: ""
     });    
     setSelectedFiles([]);
     setExistingImages([]);
@@ -187,6 +205,9 @@ export default function AdminProductPage() {
         </div>
       );
     }
+
+
+
     
     return (
       <img 
@@ -206,7 +227,7 @@ export default function AdminProductPage() {
 
   return (
     <div className="admin-dashboard">
-      <Navbar />
+      
       <div className="judul">
         <h1>Kelola Produk</h1>
         <button 
@@ -232,6 +253,7 @@ export default function AdminProductPage() {
               <tr>
                 <th>Gambar</th>
                 <th>Nama Produk</th>
+                <th>Brand</th>
                 <th>Deskripsi</th>
                 <th>Stock</th>
                 <th>Harga</th>
@@ -259,6 +281,7 @@ export default function AdminProductPage() {
                       </div>
                     </td>
                     <td>{p.name}</td>
+                    <td>{p.brand}</td>
                     <td className="description-cell">
                       {p.description.length > 50 
                         ? `${p.description.substring(0, 50)}...` 
@@ -274,19 +297,21 @@ export default function AdminProductPage() {
                             stock: p.stock,
                             price: p.price,
                             description: p.description,
+                            brand: p.brand,
+                            brand_slug: p.brand_slug,
                           });
                           setExistingImages(productImages);
                           setEditingId(p.id);
                           setEditMode(true);
                           setShowModal(true);
                         }}
-                        disabled={loading}
+                        disabled={loading} className="edit-button"
                       >
                         Edit
                       </button>
                       <button 
                         onClick={() => handleDelete(p.id)}
-                        disabled={loading}
+                        disabled={loading} className="delete-button"
                       >
                         Hapus
                       </button>
@@ -314,6 +339,26 @@ export default function AdminProductPage() {
                 required
                 disabled={loading}
               />
+
+              <select
+                name="brand"
+                value={formProduk.brand}
+                onChange={(e) => {
+                  const selected = brandOptions.find(b => b.name === e.target.value);
+                  setFormProduk(prev => ({
+                    ...prev,
+                    brand: selected.name,
+                    brand_slug: selected.slug
+                  }));
+                }}
+                required
+                disabled={loading}
+              >
+                <option value="">Pilih Brand</option>
+                {brandOptions.map((b, i) => (
+                  <option key={i} value={b.name}>{b.name}</option>
+                ))}
+              </select>
               <input
                 type="number"
                 name="stock"

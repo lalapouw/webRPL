@@ -6,8 +6,9 @@ import { cookies } from "next/headers";
 const JWT_SECRET = process.env.JWT_SECRET || "SECRET";
 
 // POST: Simpan data pembeli (sementara sebelum order final)
+// POST: Simpan data pembeli (sementara sebelum order final)
 export async function POST(req) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
   if (!token) {
@@ -37,7 +38,6 @@ export async function POST(req) {
   const db = pool;
 
   try {
-    // 1. Ambil item keranjang
     const [items] = await db.execute(`
       SELECT c.product_id, c.quantity, p.price
       FROM cart_items c
@@ -49,57 +49,39 @@ export async function POST(req) {
       return NextResponse.json({ message: "Keranjang kosong" }, { status: 400 });
     }
 
-    // 2. Hitung total
     const total = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
-    // 3. Cari order pending
     const [existing] = await db.execute(
       `SELECT id FROM orders WHERE user_id = ? AND status = 'pending' ORDER BY id DESC LIMIT 1`,
       [userId]
     );
 
-    let orderId;
-
     if (existing.length > 0) {
-      // ✅ Update order yang sudah ada
-      orderId = existing[0].id;
+      const orderId = existing[0].id;
       await db.execute(`
         UPDATE orders
-        SET name = ?, address = ?, phone = ?, total_amount = ?, status = 'paid', updated_at = NOW()
+        SET name = ?, address = ?, phone = ?, total_amount = ?, updated_at = NOW()
         WHERE id = ?
       `, [name, address, phone, total, orderId]);
+
+      return NextResponse.json({ message: "Data pembeli diperbarui", orderId });
     } else {
-      // ❌ Insert jika belum ada order pending
       const [result] = await db.execute(`
-        INSERT INTO orders (user_id, name, address, phone, total_amount, status, created_at)
-        VALUES (?, ?, ?, ?, ?, 'paid', NOW())
+        INSERT INTO orders (user_id, name, address, phone, total_amount, created_at)
+        VALUES (?, ?, ?, ?, ?, NOW())
       `, [userId, name, address, phone, total]);
 
-      orderId = result.insertId;
+      return NextResponse.json({ message: "Data pembeli disimpan", orderId: result.insertId });
     }
-
-    // 4. Simpan ke order_items
-    for (const item of items) {
-      await db.execute(`
-        INSERT INTO order_items (order_id, product_id, quantity, price)
-        VALUES (?, ?, ?, ?)
-      `, [orderId, item.product_id, item.quantity, item.price]);
-    }
-
-    // 5. Kosongkan keranjang
-    await db.execute(`DELETE FROM cart_items WHERE user_id = ?`, [userId]);
-
-    return NextResponse.json({ message: "Checkout berhasil", orderId });
-
   } catch (err) {
-    console.error("❌ Checkout error:", err);
-    return NextResponse.json({ message: "Gagal checkout" }, { status: 500 });
+    console.error("❌ Error simpan data pembeli:", err);
+    return NextResponse.json({ message: "Gagal simpan data pembeli" }, { status: 500 });
   }
 }
 
 // GET: Ambil data pembeli (dari order pending terakhir)
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
   if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -133,7 +115,7 @@ export async function GET() {
 
 // PUT: Update data pembeli sementara
 export async function PUT(req) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
   if (!token) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

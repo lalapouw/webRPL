@@ -3,17 +3,31 @@ import { pool } from '@/lib/db';
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const keyword = searchParams.get('keyword');
+  const keyword = searchParams.get('keyword') || '';
+  const brand = searchParams.get('brand') || '';
 
-  if (!keyword) {
-    return NextResponse.json([], { status: 200 });
+  let query = "SELECT * FROM products";
+  const params = [];
+
+  // Filter kondisi berdasarkan input
+  const conditions = [];
+
+  if (keyword) {
+    conditions.push("(name LIKE ? OR description LIKE ?)");
+    params.push(`%${keyword}%`, `%${keyword}%`);
+  }
+
+  if (brand) {
+    conditions.push("brand = ?");
+    params.push(brand);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
   }
 
   try {
-    const [rows] = await pool.execute(
-      "SELECT * FROM products WHERE name LIKE ? OR description LIKE ?",
-      [`%${keyword}%`, `%${keyword}%`]
-    );
+    const [rows] = await pool.execute(query, params);
 
     const products = rows.map((p) => {
       let parsedImages = [];
@@ -34,6 +48,7 @@ export async function GET(req) {
         price: p.price,
         stock: p.stock,
         description: p.description || '',
+        brand: p.brand || '',
         images: parsedImages,
       };
     });

@@ -17,6 +17,10 @@ export async function POST(req) {
   const stock = formData.get("stock");
   const price = formData.get("price");
   const description = formData.get("description") || "";
+  const brand = formData.get("brand") || "";
+  const brand_slug = formData.get("brand_slug") || "";
+
+
 
   const imagePaths = [];
   const uploadDir = path.join(process.cwd(), "public", "uploads");
@@ -43,8 +47,8 @@ export async function POST(req) {
     const imagesJson = JSON.stringify(imagePaths);
 
     await pool.execute(
-      "INSERT INTO products (name, stock, price, description, images) VALUES (?, ?, ?, ?, ?)",
-      [name, stock, price, description, imagesJson]
+      `INSERT INTO products (name, stock, price, description, images, brand, brand_slug) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [name, stock, price, description, JSON.stringify(imagePaths), brand, brand_slug]
     );
 
     return NextResponse.json({

@@ -45,7 +45,7 @@ export default function Checkout() {
 
   const handleCheckout = async () => {
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,14 +70,14 @@ export default function Checkout() {
     }
   };
 
-
-
   useEffect(() => {
     const ids = new URLSearchParams(window.location.search).getAll('ids'); // Ambil langsung dari URL
 
     const fetchOrder = async () => {
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch('/api/orders', {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error('Gagal ambil data pembeli');
         const data = await res.json();
         setForm({

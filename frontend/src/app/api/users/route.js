@@ -5,7 +5,7 @@ import { pool } from "@/lib/db"; // Sudah pakai pool untuk koneksi efisien
 export async function GET() {
   try {
     const [rows] = await pool.execute(
-      "SELECT id, username, email, role FROM users"
+      "SELECT id, username, email, role, phone FROM users"
     );
     return NextResponse.json(rows);
   } catch (error) {
